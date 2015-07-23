@@ -1,0 +1,108 @@
+#ifndef MOUSEDETECTOR_H
+#define MOUSEDETECTOR_H
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <Windows.h>
+
+class MouseDetector {
+private:
+	cv::Scalar lowerCenter, upperCenter;
+	cv::Scalar lowerLeft, upperLeft;
+	cv::Scalar lowerRight, upperRight;
+	cv::Scalar lowerScroll, upperScroll;
+
+	std::vector<std::vector<cv::Point> > contoursCenter;
+	std::vector<std::vector<cv::Point> > contoursLeft;
+	std::vector<std::vector<cv::Point> > contoursRight;
+	std::vector<std::vector<cv::Point> > contoursScroll;
+
+	std::vector<std::vector<cv::Point> >::iterator itc;
+
+	cv::Point coordenadasMouse;
+	cv::Point scrollCoordinates;
+
+	cv::Scalar centerHSV;
+	cv::Scalar leftHSV;
+	cv::Scalar rightHSV;
+	cv::Scalar scrollHSV;
+
+	cv::Scalar colorDelMouse;
+	cv::Scalar colorClickIzquiero;
+	cv::Scalar greenColor;
+	cv::Scalar redColor;
+
+	bool bMouseDetected;
+	bool bLeftClickDetected;
+	bool bRightClickDetected;
+	bool bScrollDetected;
+
+	cv::Mat result;
+	int minMarkerArea;
+
+	int scrollAnchorYCoordinate;
+
+	int centerThresh;
+	int leftThresh;
+	int rightThresh;
+	int scrollThresh;
+public:
+	MouseDetector() {
+		setCenterColorThreshold(50);
+		setLeftColorThreshold(50);
+		setRightColorThreshold(50);
+		setScrollColorThreshold(50);
+		setCenterHSV(0,0,0);
+		setLeftHSV(0,0,0);
+		setRightHSV(0,0,0);
+		setScrollHSV(0,0,0);
+		setScrollAnchorYCoordinate(240);
+		setMinArea(100);
+		coordenadasMouse = cv::Point(0, 0);
+		scrollCoordinates = cv::Point(0,0);
+		bMouseDetected = false;
+		bLeftClickDetected = false;
+		bRightClickDetected = false;
+		bScrollDetected = false;
+		colorDelMouse = cv::Scalar(222,154,87); //mouse
+		greenColor = cv::Scalar();//scroll
+		colorClickIzquiero = cv::Scalar(119, 161, 90); //click izquierdo
+		redColor = cv::Scalar();//click derecho
+	};
+	void setMinArea(int minArea);
+	void setCenterHSV(int H, int S, int V);
+	void setLeftHSV(int H, int S, int V);
+	void setRightHSV(int H, int S, int V);
+	void setScrollHSV(int H, int S, int V);
+	void setCenterColorThreshold(int threshold);
+	void setLeftColorThreshold(int threshold);
+	bool mouseDetected();
+	cv::Point getCenterMarkerCoordinates();
+	void processCenterMarker(cv::Mat &image);
+	void processLeftMarker(cv::Mat &image);
+	void processRightMarker(cv::Mat &image);
+	void processScrollMarker(cv::Mat &image);
+	void calibrateCoordinates(cv::Point &coordinates);
+	void moveMouse(cv::Point coordinates);
+	bool getLeftClickStatus();
+	bool getRightClickStatus();
+	bool scrollDetected();
+	int getScrollSpeed();
+	void setRightColorThreshold(int threshold);
+	void setScrollColorThreshold(int threshold);
+	void setScrollAnchorYCoordinate(int y_coord);
+	void leftClickDown(cv::Point coordinates);
+	void leftClickUp(cv::Point coordinates);
+	void rightClickDown(cv::Point coordinates);
+	void rightClickUp(cv::Point coordinates);
+	void scroll(cv::Point coordinates, int scrollSpeed);
+	void displayMouseStatus(cv::Mat &image);
+private:
+	std::string convertInt(int num);
+	void printCenterCoordinates(cv::Mat image, cv::Point coordinates);
+	void printScrollCoordinates(cv::Mat image, cv::Point coordinates);
+	int getScrollYCoordinate();
+	int getScrollAnchorYCoordinate();
+};
+
+#endif MOUSEDETECTOR_H
